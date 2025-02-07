@@ -7,6 +7,7 @@ package com.phasmidsoftware.dsaipg.adt.threesum;
 import com.phasmidsoftware.dsaipg.util.Benchmark_Timer;
 import com.phasmidsoftware.dsaipg.util.TimeLogger;
 
+import java.util.Random;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 import java.util.function.UnaryOperator;
@@ -90,8 +91,27 @@ public class TwoSumBenchmark {
      */
     private void benchmarkTwoSum(final String description, final Consumer<int[]> function, int n, final TimeLogger[] timeLoggers) {
         if (n > 8000) return;
-        // TO BE IMPLEMENTED 
-throw new RuntimeException("implementation missing");
+        // TO BE IMPLEMENTED
+
+        // Create a benchmark timer for this specific implementation
+        // The description will identify which algorithm we're testing
+        Benchmark_Timer<int[]> timer = new Benchmark_Timer<>(
+                description,
+                null,              // No pre-function needed as we're using a supplier
+                function,          // The TwoSum implementation to benchmark
+                null              // No post-function needed
+        );
+
+        // Run the benchmark using our supplier and get the average time
+        double time = timer.runFromSupplier(supplier, runs);
+
+        // Log the results using both time loggers
+        // First logger shows raw time, second shows normalized time
+        for (TimeLogger timeLogger : timeLoggers) {
+            timeLogger.log(description, time, n);
+        }
+
+//throw new RuntimeException("implementation missing");
     }
 
     /**
