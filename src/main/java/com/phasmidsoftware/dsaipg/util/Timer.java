@@ -65,7 +65,50 @@ public class Timer {
      */
     public <T, U> double repeat(int n, boolean warmup, Supplier<T> supplier, Function<T, U> function, UnaryOperator<T> preFunction, Consumer<U> postFunction) {
         // TO BE IMPLEMENTED : note that the timer is running when this method is called and should still be running when it returns.
-         return 0;
+
+        // Pause the timer while setting up
+        pause();
+
+        int lastx = n;
+
+        // Start the timed section
+        resume();
+
+        for (int i = 0; i < n; i++) {
+            // If we're in warmup phase, don't print status
+            if (!warmup)
+                lastx = doPrintStatus(lastx, n - i);
+
+            // Get input from supplier
+            T input = supplier.get();
+
+            // Pause timer for pre-processing if needed
+            pause();
+            if (preFunction != null)
+                input = preFunction.apply(input);
+            resume();
+
+            // Run and time the main function
+            U result = function.apply(input);
+            lap();
+
+            // Pause timer for post-processing if needed
+            pause();
+            if (postFunction != null)
+                postFunction.accept(result);
+            resume();
+        }
+
+        // Pause timer and calculate results
+        pauseAndLap();
+        if (!warmup)
+            System.out.println();
+
+        // Get the mean lap time and resume the timer before returning
+        double meanTime = meanLapTime();
+        resume();
+
+        return meanTime;
         // END SOLUTION
     }
 
@@ -240,7 +283,7 @@ public class Timer {
      */
     private static long getClock() {
         // TO BE IMPLEMENTED 
-         return 0;
+        return System.nanoTime();
         // END SOLUTION
     }
 
@@ -253,7 +296,7 @@ public class Timer {
      */
     private static double toMillisecs(long ticks) {
         // TO BE IMPLEMENTED 
-         return 0;
+        return ticks / 1000000.0;
         // END SOLUTION
     }
 
