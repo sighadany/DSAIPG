@@ -100,7 +100,7 @@ public class Timer {
         }
 
         // Pause timer and calculate results
-        pauseAndLap();
+        pause();
         if (!warmup)
             System.out.println();
 
