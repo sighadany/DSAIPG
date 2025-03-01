@@ -36,7 +36,7 @@ public class PriorityQueueBenchmark {
      */
     public PriorityQueueBenchmark(int runs, int numberOfElementsToInsert, int rangeOfValues, int sizeOfHeap, int numberOfElementsToRemove) {
         this.runs = runs;
-        this.supplier = new Source(numberOfElementsToInsert, rangeOfValues).intsSupplier(10);
+        this.supplier = new Source(numberOfElementsToInsert, rangeOfValues).intsSupplier();
         this.numberOfElementsToInsert = numberOfElementsToInsert;
         this.numberOfElementsToRemove = numberOfElementsToRemove;
         this.sizeOfHeap = sizeOfHeap;
@@ -137,6 +137,7 @@ public class PriorityQueueBenchmark {
      * @param args command-line arguments (not used in this application).
      */
     public static void main(String[] args) {
+//        new PriorityQueueBenchmark(100, 15, 250, 15, 5).runBenchmarks();
         new PriorityQueueBenchmark(100, 250, 250, 4095, 62).runBenchmarks();
         new PriorityQueueBenchmark(100, 500, 500, 4095, 125).runBenchmarks();
         new PriorityQueueBenchmark(100, 1000, 1000, 4095, 250).runBenchmarks();

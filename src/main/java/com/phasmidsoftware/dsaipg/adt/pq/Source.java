@@ -4,6 +4,7 @@ package com.phasmidsoftware.dsaipg.adt.pq;
  */
 
 import java.lang.reflect.Array;
+import java.util.HashSet;
 import java.util.Arrays;
 import java.util.Random;
 import java.util.function.Supplier;
@@ -58,31 +59,37 @@ class Source {
      * - Each value in the resulting array is distinct
      * - The output array is ordered and uniformly samples the distinct values
      *
-     * @param safetyFactor the safety factor which determines the size of the initial integer pool
      * @return a {@code Supplier} of an Integer array with n distinct, ordered integers
      */
-    public Supplier<Integer[]> intsSupplier(int safetyFactor) {
+    public Supplier<Integer[]> intsSupplier() {
         return () -> {
-            // Generate initial array of integers
-            Integer[] ints = new Integer[safetyFactor * n];
-            for (int i = 0; i < ints.length; i++) {
-                ints[i] = random.nextInt(safetyFactor * m) - (safetyFactor * m / 2);
+            // Generate set integers
+            HashSet<Integer> uniqueValues = new HashSet<>();
+
+            while(uniqueValues.size() < n) {
+                uniqueValues.add( random.nextInt(2 * m) - m );
             }
 
-            // Sort and get distinct values
-            Arrays.sort(ints);
-            Integer[] distinct = Arrays.stream(ints)
-                    .distinct()
-                    .toArray(Integer[]::new);
-
-            // Sample n values uniformly
-            Integer[] result = new Integer[n];
-            for (int i = 0; i < n; i++) {
-                result[i] = distinct[i * (distinct.length / n)];
-            }
+            Integer[] result = uniqueValues.toArray(new Integer[0]);
+            Arrays.sort(result);
 
             return result;
         };
+    }
+
+    public static void main(String[] args) {
+        doMain();
+    }
+
+    static void doMain() {
+        System.out.println("TEST OF SOURCE CLASS");
+        // n must be at most 2 * m to guarantee uniqueness --> n ≤ 2m
+        Source mySource = new Source(15, 250);
+        Supplier<Integer[]> mySupplier = mySource.intsSupplier();
+        Integer[] myIntegers = mySupplier.get();
+        for (int i = 0; i < 15; i++) {
+            System.out.println(myIntegers[i]);
+        }
     }
 
     private final int n;
