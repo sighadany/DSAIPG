@@ -21,9 +21,12 @@ import java.util.function.Supplier;
 import java.util.function.UnaryOperator;
 import java.util.stream.Stream;
 
+import static com.phasmidsoftware.dsaipg.sort.Instrument.*;
+import static com.phasmidsoftware.dsaipg.sort.Instrument.COPIES;
 import static com.phasmidsoftware.dsaipg.sort.InstrumentedComparatorHelper.AT;
 import static com.phasmidsoftware.dsaipg.sort.linearithmic.MergeSort.MERGESORT;
 import static com.phasmidsoftware.dsaipg.util.Config_Benchmark.isInstrumented;
+import static com.phasmidsoftware.dsaipg.util.Config_Benchmark.setupConfig;
 import static com.phasmidsoftware.dsaipg.util.SortBenchmarkHelper.*;
 import static com.phasmidsoftware.dsaipg.util.Utilities.formatWhole;
 
@@ -165,8 +168,10 @@ public class SortBenchmark {
         int nRunsBucket = estimateRuns(totalWork, 2.0 * nWords + 0.5 * nWords * nWords / BucketSort.DIGRAPHS_SIZE);
 
         // System sort
-        if (isConfigBenchmarkStringSorter("puresystemsort") && nRunsLinearithmic > 0)
+        if (isConfigBenchmarkStringSorter("puresystemsort") && nRunsLinearithmic > 0) {
             runPureSystemSortBenchmark(words, nWords, nRunsLinearithmic, random);
+        }
+
 
         // Linear sorts
         if (isConfigBenchmarkStringSorter("bucketsort") && nRunsBucket > 0)
@@ -197,8 +202,12 @@ public class SortBenchmark {
                 runStringSortBenchmark(words, nWords, nRunsLinearithmic * 2, sorter, timeLoggersLinearithmic);
             }
 
-        if (isConfigBenchmarkStringSorter(MERGESORT))
+        if (isConfigBenchmarkStringSorter(MERGESORT)) {
             runMergeSortBenchmark(words, nWords, nRunsLinearithmic * 4, config);
+
+//            runMergeSortInstrumentation(words, nWords);
+        }
+
 
         if (isConfigBenchmarkStringSorter("quicksort3way") && nRunsLinearithmic > 0)
             try (SortWithHelper<String> sorter = new QuickSort_3way<>(nWords, nRunsLinearithmic, config)) {
@@ -208,6 +217,8 @@ public class SortBenchmark {
         if (isConfigBenchmarkStringSorter("quicksortDualPivot") && nRunsLinearithmic > 0)
             try (SortWithHelper<String> sorter = new QuickSort_DualPivot<>(nWords, nRunsLinearithmic, config)) {
                 runStringSortBenchmark(words, nWords, nRunsLinearithmic * 4, sorter, timeLoggersLinearithmic);
+
+//                runQuickSortInstrumentation(words, nWords);
             }
 
         if (isConfigBenchmarkStringSorter("quicksort") && nRunsLinearithmic > 0)
@@ -218,6 +229,8 @@ public class SortBenchmark {
         if (isConfigBenchmarkStringSorter("heapsort") && nRunsLinearithmic > 0) {
             try (SortWithHelper<String> sorter = new HeapSort<>(nWords, nRunsLinearithmic, config)) {
                 runStringSortBenchmark(words, nWords, nRunsLinearithmic * 3, sorter, timeLoggersLinearithmic);
+
+//                runHeapSortInstrumentation(words, nWords);
             }
         }
 
@@ -260,6 +273,68 @@ public class SortBenchmark {
                     runStringSortBenchmark(words, nWords, nRunsQuadraticSlow, sorter, timeLoggersQuadratic);
                 }
         }
+    }
+
+    private void runMergeSortInstrumentation(String[] words, int size) {
+        // Create a configuration for instrumentation
+        // Create a configuration for instrumentation
+        final Config config = setupConfig("true", "false", "", "0", "1", "");
+
+        SortWithHelper<String> sorter = new MergeSort<>(size, 1, config);
+
+        // Create a copy of the array with the correct size
+        String[] sample = Arrays.copyOf(words, size);
+
+        // Sort the array and log metrics
+        sorter.sort(sample);
+
+        // Get the helper and log metrics
+        Helper<String> helper = sorter.getHelper();
+        logger.info("Size: " + size);
+        logger.info("# of swaps: " + helper.getSwaps());
+        logger.info("# of compares: " + helper.getCompares());
+        logger.info("# of copies: " + helper.getCopies());
+        logger.info("# of hits: " + helper.getHits());
+    }
+
+
+    private void runQuickSortInstrumentation(String[] words, int size) {
+        final Config config = setupConfig("true", "false", "", "0", "1", "");
+        SortWithHelper<String> sorter = new QuickSort_DualPivot<>(size, 1, config);
+
+        // Create a copy of the array with the correct size
+        String[] sample = Arrays.copyOf(words, size);
+
+        // Sort the array and log metrics
+        sorter.sort(sample);
+
+        // Get the helper and log metrics
+        Helper<String> helper = sorter.getHelper();
+        logger.info("Size: " + size);
+        logger.info("# of swaps: " + helper.getSwaps());
+        logger.info("# of compares: " + helper.getCompares());
+        logger.info("# of copies: " + helper.getCopies());
+        logger.info("# of hits: " + helper.getHits());
+    }
+
+
+    private void runHeapSortInstrumentation(String[] words, int size) {
+        final Config config = setupConfig("true", "false", "", "0", "1", "");
+        SortWithHelper<String> sorter = new HeapSort<>(size, 1, config);
+
+        // Create a copy of the array with the correct size
+        String[] sample = Arrays.copyOf(words, size);
+
+        // Sort the array and log metrics
+        sorter.sort(sample);
+
+        // Get the helper and log metrics
+        Helper<String> helper = sorter.getHelper();
+        logger.info("Size: " + size);
+        logger.info("# of swaps: " + helper.getSwaps());
+        logger.info("# of compares: " + helper.getCompares());
+        logger.info("# of copies: " + helper.getCopies());
+        logger.info("# of hits: " + helper.getHits());
     }
 
     /**

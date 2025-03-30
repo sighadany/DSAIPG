@@ -45,6 +45,7 @@ public class MergeSortTest {
         final Config config = setupConfig("true", "false", "", "0", "1", "");
         Sort<Integer> s = new MergeSort<>(xs.length, 1, config);
         Integer[] ys = s.sort(xs);
+//        Integer[] ys = s.sort(xs, true);
         assertEquals(Integer.valueOf(1), ys[0]);
         assertEquals(Integer.valueOf(2), ys[1]);
         assertEquals(Integer.valueOf(3), ys[2]);
@@ -158,6 +159,7 @@ public class MergeSortTest {
         insertionHelper.postProcess(xs);
         final Helper<Integer> mergeHelper = HelperFactory.create("merge sort", N, setupConfig("true", "false", "", "0", "1", ""));
         System.out.println(mergeHelper);
+
         try (Sort<Integer> mergeSort = new MergeSort<>(mergeHelper)) {
             mergeSort.init(N);
             mergeHelper.preProcess(xs);

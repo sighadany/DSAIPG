@@ -4,12 +4,12 @@
 
 package com.phasmidsoftware.dsaipg.sort.linearithmic;
 
-import com.phasmidsoftware.dsaipg.sort.Helper;
-import com.phasmidsoftware.dsaipg.sort.SortException;
-import com.phasmidsoftware.dsaipg.sort.SortWithComparableHelper;
+import com.phasmidsoftware.dsaipg.sort.*;
 import com.phasmidsoftware.dsaipg.sort.elementary.InsertionSort;
 import com.phasmidsoftware.dsaipg.util.Config;
 
+import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Arrays;
 
 import static com.phasmidsoftware.dsaipg.util.Config_Benchmark.*;
@@ -77,9 +77,53 @@ public class MergeSort<X extends Comparable<X>> extends SortWithComparableHelper
             return;
         }
 
-        // TO BE IMPLEMENTED  : implement merge sort with insurance and no-copy optimizations
-throw new RuntimeException("implementation missing");
+        int mid = from + (to - from) / 2;
+
+        // test noCopy first
+
+        if(noCopy) {
+            sort(aux, a, from, mid);
+            sort(aux, a, mid, to);
+            if(insurance && helper.less(aux, mid - 1, mid)) {
+                helper.copyBlock(aux, from, a, from, to - from);
+            } else {
+                merge(aux, a, from, mid, to);
+            }
+        } else {
+            sort(a, aux, from, mid);
+            sort(a, aux, mid, to);
+            helper.copyBlock(a, from, aux, from, to - from);
+            if(insurance && helper.less(a, mid - 1, mid)) {
+                return;
+            } else {
+                merge(aux, a, from, mid, to);
+            }
+        }
     }
+
+//        if(insurance) {
+//            sort(aux, a, from, mid);
+//            sort(aux, a, mid, to);
+//            if(noCopy && helper.less(aux[mid - 1], aux[mid])) {
+//                helper.copyBlock(aux, from, a, from, to - from);
+//                // we still need to do a copy
+//                // merge is a slow way of doing a copy
+//            } else {
+//                merge(aux, a, from, mid, to);
+//            }
+//
+//        } else {
+//            sort(a, aux, from, mid);
+//            sort(a, aux, mid, to);
+//            helper.copyBlock(a, from, aux, from, to - from);
+//            if(noCopy && helper.less(a[mid - 1], a[mid])) {
+//                return;
+//            }
+//            merge(a, aux, from, mid, to);
+
+            // TO BE IMPLEMENTED  : implement merge sort with insurance and no-copy optimizations
+//throw new RuntimeException("implementation missing");
+
 
     // CONSIDER combine with MergeSortBasic, perhaps.
     private void merge(X[] sorted, X[] result, int from, int mid, int to) {
@@ -145,5 +189,19 @@ throw new RuntimeException("implementation missing");
             throw new SortException("Array memory has not been set");
         return 1.0 * maxMemory / arrayMemory;
     }
+
+//    public static void main(String args[]) throws IOException {
+//        Config config = Config.load(MergeSort.class);
+//        final int k = 5;
+//        final int N = (int) Math.pow(2, k);
+//        final Helper<Integer> helper1 = HelperFactory.create("insertion sort", N, setupConfig2("true", "0", "1", "", "", "true", "false"));
+//        final Integer[] xs = helper1.random(Integer.class, r -> r.nextInt(10000));
+//
+//        Sort<Integer> s = new MergeSort<>(xs.length, 1, config);
+//        Integer[] ys = s.sort(xs);
+//        for(Integer i : ys) {
+//            System.out.print(i + " ");
+//        }
+//    }
 
 }
