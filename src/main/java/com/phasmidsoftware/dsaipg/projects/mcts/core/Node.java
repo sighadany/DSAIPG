@@ -43,18 +43,23 @@ public interface Node<G extends Game> {
      * Method which adds the immediate children of this Node.
      * NOTE this is a mutating method. I'm not sure if that's best.
      */
-    default void explore() {
-        if (isLeaf()) return;
-        if (children().isEmpty()) {
-            addChildren(state());
-            backPropagate();
-        } else throw new RuntimeException("exploration done already for " + this);
-    }
+    void explore();
+//    default void explore() {
+//        if (isLeaf()) return;
+//        if (children().isEmpty()) {
+//            addChildren(state());
+////            aggregateChildStats();
+////            backPropagate();
+//        }
+////        else throw new RuntimeException("exploration done already for " + this);
+//    }
 
     /**
      * This method sets the number of wins and playouts according to the children states.
      */
-    void backPropagate();
+//    void backPropagate();
+//    void aggregateChildStats(); // New name
+
 
     /**
      * Method to add a child to this Node.
@@ -63,19 +68,38 @@ public interface Node<G extends Game> {
      */
     void addChild(State<G> state);
 
+
+    /**
+     * add a visit.
+     */
+    void addVisit();
+
+
     /**
      * @return the score for this Node and its descendents a win is worth 2 points, a draw is worth 1 point.
      */
     int wins();
 
     /**
+     * Gets the parent of this node.
+     *
+     * @return The parent node, or null if this is the root node.
+     */
+    Node<G> getParent();
+
+    /**
      * @return the number of playouts evaluated (including this node). A leaf node will have a playouts value of 1.
      */
     int playouts();
 
-    private void addChildren(final State<G> state) {
-        for (Iterator<Move<G>> it = state.moveIterator(state.player()); it.hasNext(); )
-            addChild(state.next(it.next()));
-    }
+    /**
+     * @return the number of visits evaluated (including this node). A leaf node will have a visit value of 0.
+     */
+    int visits();
+
+//    private void addChildren(final State<G> state) {
+//        for (Iterator<Move<G>> it = state.moveIterator(state.player()); it.hasNext(); )
+//            addChild(state.next(it.next()));
+//    }
 
 }
